@@ -1,7 +1,4 @@
-.default-button {
-    margin: 5px;
-    padding: 5px 20px;
-    border: 0;
+.button {
     border-radius: 5px;
 
     background-color: #02203b;
@@ -9,6 +6,6 @@
     transition: ease-in 0.3s;
 }
 
-.default-button:hover {
+.button:hover {
     background-color: #074f93;
 }

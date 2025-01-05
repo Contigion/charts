@@ -1,5 +1,6 @@
 from dash import html
 
 
-def button(id, text, className='default-button'):
-    return html.Button(text, id=id, className=className, n_clicks=0)
+def button(button_id, text, className=''):
+    classes = ' '.join(['component button', className])
+    return html.Button(text, id=button_id, className=classes, n_clicks=0)
