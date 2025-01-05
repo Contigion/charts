@@ -1,0 +1,13 @@
+.input {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input p {
+    color: #000000;
+}
+
+.input * {
+    margin: 0;
+}
