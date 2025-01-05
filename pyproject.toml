@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "contigion-charts"
 version = "0.0.0"
-description = ""
+description = "A library for visualising the forex charts"
 authors = [
     { name = "Contigion", email = "contigion@gmail.com" }
 ]
@@ -13,7 +13,7 @@ readme = "README.md"
 dependencies = [
     "pandas",
     "pandas_ta",
-    "numpy==1.26.4",
+    "numpy<2.0.0",
     "MetaTrader5"
 ]
 classifiers = [

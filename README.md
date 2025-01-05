@@ -1,5 +1,5 @@
 # contigion-charts
-A template repo for future Contigion repositories
+A library for visualising the forex charts
 
 [![Pylint](https://github.com/Contigion/charts/actions/workflows/pylint.yml/badge.svg?branch=main)](https://github.com/Contigion/charts/actions/workflows/pylint.yml)
 [![Publish to PyPI](https://github.com/Contigion/charts/actions/workflows/publish.yml/badge.svg?branch=main)](https://github.com/Contigion/charts/actions/workflows/publish.yml)
