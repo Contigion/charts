@@ -3,7 +3,7 @@ requires = ["setuptools>=42", "wheel", "build"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "contigion-<REPOSITORY>"
+name = "contigion-charts"
 version = "0.0.0"
 description = ""
 authors = [
@@ -22,4 +22,4 @@ classifiers = [
 ]
 
 [tool.setuptools]
-packages = ["contigion_<REPOSITORY>"]
+packages = ["contigion_charts"]

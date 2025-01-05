@@ -3,11 +3,11 @@ name: Publish to PyPI
 on:
   push:
     branches: [ main ]
-    paths: [ "contigion_<REPOSITORY>/**", "tests/**" ]
+    paths: [ "contigion_charts/**", "tests/**" ]
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  PACKAGE_NAME: "contigion_<REPOSITORY>"
+  PACKAGE_NAME: "contigion_charts"
   OWNER: "Contigion"
 
 jobs:
