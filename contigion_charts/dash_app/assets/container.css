@@ -61,3 +61,7 @@
 .container:not(.full-height) {
     height: fit-content;
 }
+
+.container-centered {
+    align-items: center;
+}

@@ -8,9 +8,13 @@
 
 .icon-button {
     cursor: pointer;
+    transition: ease-in 0.3s;
 }
 
-.button:hover,
-.icon-button {
+.icon-button:hover {
+    color: #0b6ecc;
+}
+
+.button:hover {
     background-color: #074f93;
 }
