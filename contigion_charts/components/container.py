@@ -10,6 +10,10 @@ def background():
     return Div([], className="background")
 
 
+def container(children=None, class_name=''):
+    return Div(children, className=class_name)
+
+
 def content_container_row(children=None, class_name=''):
     classes = ' '.join(['container content-container container-row', class_name])
     return Div(children, className=classes)
