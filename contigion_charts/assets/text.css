@@ -1,0 +1,8 @@
+.text:not(a) {
+    color: #303030;
+}
+
+a {
+    color: #1275cc;
+    text-decoration: none;
+}
