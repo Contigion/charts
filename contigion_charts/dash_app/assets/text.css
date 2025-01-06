@@ -4,17 +4,26 @@
     font-family: 'Rubik', sans-serif;
 }
 
-.text:not(a) {
-    color: #303030;
-}
-
 a {
     color: #1275cc;
     text-decoration: none;
 }
 
+.text:not(a) {
+    color: #303030;
+}
+
 .bold-text {
     font-weight: bold;
+}
+
+.icon {
+    width: fit-content;
+    padding: 5px;
+    border: 0;
+
+    color: #02203b;
+    font-size: 1.5rem;
 }
 
 .white {

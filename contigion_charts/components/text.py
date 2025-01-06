@@ -27,5 +27,5 @@ def link(link_id, text_input, href, class_name=''):
 
 
 def icon(icon_id, class_name):
-    I(className=class_name, id=icon_id, n_clicks=0)
-
+    classes = ' '.join(['component icon', class_name])
+    return I(className=classes, id=icon_id)

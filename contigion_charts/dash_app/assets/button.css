@@ -6,6 +6,11 @@
     transition: ease-in 0.3s;
 }
 
-.button:hover {
+.icon-button {
+    cursor: pointer;
+}
+
+.button:hover,
+.icon-button {
     background-color: #074f93;
 }
