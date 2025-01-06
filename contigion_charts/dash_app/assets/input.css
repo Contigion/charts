@@ -13,3 +13,27 @@
 .input * {
     margin: 0;
 }
+
+.checklist input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    background-color: #ffffff;
+    border: 2px solid #ffffff;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.checklist input[type="checkbox"]:checked {
+    background-color: #02203b;
+    border-color: #02203b;
+}
+
+.checklist *{
+    display: flex !important;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+
+    font-weight: normal;
+}
