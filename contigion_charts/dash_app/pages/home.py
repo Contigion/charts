@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from dash import register_page, callback, Output, Input, State
+from dash import register_page, callback, Output, Input, State, callback_context
 from contigion_metatrader import get_timeframe_value, get_market_data, get_symbol_names, get_timeframes
 from dash.html import Div
 
@@ -40,9 +40,8 @@ def layout():
     ])
 
     control_panel = content_container_row(children=[
-        icon_button('controls-previous', 'bi bi-rewind-fill'),
+        icon_button('controls-restart', 'bi bi-arrow-clockwise'),
         icon_button('controls-play-stop', 'bi bi-play-fill green-icon-button'),
-        icon_button('controls-next', 'bi bi-fast-forward-fill'),
         icon_button('controls-decrease', 'bi bi-dash'),
         text('controls-current-index', 'Candle 0'),
         icon_button('controls-increase', 'bi bi-plus'),
@@ -96,22 +95,6 @@ def update_chart(_, symbol, timeframe, n_candles):
 
 
 @callback(
-    Input('controls-previous', 'n_clicks'),
-    prevent_initial_call=True
-)
-def controls_previos(n_clicks):
-    print('previous <<')
-
-
-@callback(
-    Input('controls-next', 'n_clicks'),
-    prevent_initial_call=True
-)
-def controls_next(n_clicks):
-    print('next >>')
-
-
-@callback(
     Output('controls-play-stop', 'className'),
     Input('controls-play-stop', 'n_clicks'),
     State('controls-play-stop', 'className'),
@@ -133,38 +116,34 @@ def controls_play_stop(_, current_classes):
 
 @callback(
     Output('controls-current-index', 'children'),
-    Input('controls-decrease', 'n_clicks'),
-    State('controls-current-index', 'children'),
+    [Input('controls-decrease', 'n_clicks'),
+     Input('controls-increase', 'n_clicks'),
+     Input('controls-restart', 'n_clicks')],
+    [State('controls-current-index', 'children'),
+     State('n-candles-input', 'value')],
     prevent_initial_call=True
 )
-def controls_decrease(_, component_text):
-    c = component_text.split(' ')
-    prefix = c[0]
-    index = int(c[1])
-
-    if index > 0:
-        return f'{prefix} {index - 1}'
-
-    return component_text
-
-
-@callback(
-    Output('controls-current-index', 'children'),
-    Input('controls-increase', 'n_clicks'),
-    State('controls-current-index', 'children'),
-    State('n-candles-input', 'value'),
-    prevent_initial_call=True
-)
-def controls_increase(_, component_text, n_candles):
+def controls_increase_decrease(n_clicks_decrease, n_clicks_increase, n_clicks_restart, component_text, n_candles):
     if n_candles is None:
         raise ValueError(f"{__file__}: {update_chart.__name__}\n"
                          f"Unable to update index: n_candles={n_candles}\n")
 
+    # Determine which button was clicked
+    ctx = callback_context
+    if not ctx.triggered:
+        return component_text
+
     c = component_text.split(' ')
     prefix = c[0]
     index = int(c[1])
 
-    if (index + 1) < n_candles:
+    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+    if triggered_id == 'controls-decrease' and index > 0:
+        return f'{prefix} {index - 1}'
+    elif triggered_id == 'controls-restart':
+        return f'{prefix} {0}'
+    elif triggered_id == 'controls-increase' and n_candles is not None and (index + 1) < n_candles:
         return f'{prefix} {index + 1}'
 
     return component_text
