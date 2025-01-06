@@ -18,3 +18,12 @@
 .button:hover {
     background-color: #074f93;
 }
+
+.green-icon-button:hover {
+    color: #22d522;
+}
+
+.red-icon-button:hover {
+    color: #cc1010;
+}
+

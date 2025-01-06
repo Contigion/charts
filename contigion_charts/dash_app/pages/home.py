@@ -1,31 +1,28 @@
-from datetime import datetime
-
 from dash import register_page, callback, Output, Input, State, callback_context
 from contigion_metatrader import get_timeframe_value, get_market_data, get_symbol_names, get_timeframes
-from dash.html import Div
 
 from contigion_charts.components import (page, container_row, content_container_col, dropdown, number_input, get_chart,
                                          button, title, checklist, icon_button, text, content_container_row, container,
                                          container_col)
+from contigion_charts.dash_app.util import get_current_time
+from contigion_charts.dash_app.util.home_callbacks import candlestick_index_callback, play_stop_callback
+from contigion_charts.dash_app.util.indicators import get_indicators
 
 register_page(__name__, path='/', title='Contigion Charts', name='charts')
 
+# Defaults
+symbol = 'USDJPYmicro'
+timeframe = 'M15'
+n_candles = 500
+step = 10
+
 
 def layout():
-    symbol = 'USDJPYmicro'
-    timeframe = 'M15'
-    n_candles = 500
-    step = 10
     data = get_market_data(symbol, get_timeframe_value(timeframe), n_candles)
 
     symbols = get_symbol_names()
     timeframes = get_timeframes()
-    indicators = [{'label': 'A', 'value': 'A'}, {'label': 'B', 'value': 'B'}, {'label': 'C', 'value': 'C'}, ]
-
-    chart_container = container([
-        get_chart(symbol, data),
-    ])
-    chart_container.id = 'chart-container'
+    indicators = get_indicators()
 
     chart_params = content_container_col(children=[
         dropdown('symbol-dropdown', 'Symbol', symbol, symbols, 'bold-text'),
@@ -47,16 +44,25 @@ def layout():
         icon_button('controls-increase', 'bi bi-plus'),
     ], class_name='container-centered')
 
+    chart_title = container_col([
+        title('chart-title', f'{symbol} {timeframe} Chart', 'bold-text'),
+        text('chart-last-update', f'{get_current_time()}')
+    ])
+
+    chart_container = container([
+        get_chart(symbol, data, []),
+    ], class_name='left')
+    chart_container.id = 'chart-container'
+
+    right_container = container_col(children=[
+        control_panel,
+        indicator_panel,
+        chart_params
+    ], class_name='right')
+
     home_content = container_row(children=[
         chart_container,
-        chart_params,
-        indicator_panel,
-        control_panel
-    ], class_name='full-width full-height')
-
-    chart_title = container([
-        title('chart-title', f'{symbol} {timeframe} Chart', 'bold-text'),
-        text('chart-last-update', f'{get_current_time()}', 'white')
+        right_container
     ])
 
     home_page = page(page_id='home-page', children=[
@@ -68,30 +74,30 @@ def layout():
 
 
 @callback(
-    [
-        Output('chart-title', 'children'),
-        Output('chart-last-update', 'children'),
-        Output('chart-container', 'children')
-
-    ],
+    Output('chart-title', 'children'),
+    Output('chart-last-update', 'children'),
+    Output('chart-container', 'children'),
     Input('update-chart', 'n_clicks'),
     State('symbol-dropdown', 'value'),
     State('timeframe-dropdown', 'value'),
     State('n-candles-input', 'value'),
+    State('indicator-checklist', 'value'),
     prevent_initial_call=True
 )
-def update_chart(_, symbol, timeframe, n_candles):
-    if symbol is None or timeframe is None or n_candles is None:
+def update_chart(_, symbol, timeframe, n_candles, selected_indicators):
+    if (symbol is None) or (timeframe is None) or (n_candles is None):
         raise ValueError(f"{__file__}: {update_chart.__name__}\n"
                          f"Unable to update chart: symbol={symbol}, timeframe={timeframe}, n_candles={n_candles}\n")
+
+    indicators = [indicator for indicator in selected_indicators if indicator]
 
     chart_title = f"{symbol} {timeframe} Chart"
     last_update = get_current_time()
 
     data = get_market_data(symbol, get_timeframe_value(timeframe), n_candles)
-    chart = get_chart(symbol, data)
+    chart = get_chart(symbol, data, indicators)
 
-    return [chart_title], [last_update], [chart]
+    return chart_title, last_update, chart
 
 
 @callback(
@@ -101,17 +107,7 @@ def update_chart(_, symbol, timeframe, n_candles):
     prevent_initial_call=True
 )
 def controls_play_stop(_, current_classes):
-    classes = current_classes
-
-    if 'play' in current_classes:
-        classes = current_classes.replace('play', 'stop').replace('green', 'red')
-        return classes
-
-    elif 'stop' in current_classes:
-        classes = current_classes.replace('stop', 'play').replace('red', 'green')
-        return classes
-
-    return classes
+    return play_stop_callback(current_classes)
 
 
 @callback(
@@ -123,36 +119,9 @@ def controls_play_stop(_, current_classes):
      State('n-candles-input', 'value')],
     prevent_initial_call=True
 )
-def controls_increase_decrease(n_clicks_decrease, n_clicks_increase, n_clicks_restart, component_text, n_candles):
-    if n_candles is None:
-        raise ValueError(f"{__file__}: {update_chart.__name__}\n"
+def controls_increase_decrease(_, __, ___, component_text, n_candles):
+    if (n_candles is None) or (not callback_context.triggered):
+        raise ValueError(f"{__file__}: {controls_increase_decrease.__name__}\n"
                          f"Unable to update index: n_candles={n_candles}\n")
 
-    # Determine which button was clicked
-    ctx = callback_context
-    if not ctx.triggered:
-        return component_text
-
-    c = component_text.split(' ')
-    prefix = c[0]
-    index = int(c[1])
-
-    triggered_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
-    if triggered_id == 'controls-decrease' and index > 0:
-        return f'{prefix} {index - 1}'
-    elif triggered_id == 'controls-restart':
-        return f'{prefix} {0}'
-    elif triggered_id == 'controls-increase' and n_candles is not None and (index + 1) < n_candles:
-        return f'{prefix} {index + 1}'
-
-    return component_text
-
-
-def get_current_time():
-    current_date = datetime.now()
-    current_time = current_date.strftime('%H:%M:%S')
-    current_day = current_date.strftime('%a')
-    current_date_str = current_date.strftime('%d %b')
-
-    return f"{current_day}, {current_date_str} - {current_time}"
+    return candlestick_index_callback(callback_context, component_text, n_candles)

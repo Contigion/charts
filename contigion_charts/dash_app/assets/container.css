@@ -4,8 +4,10 @@
     min-width: fit-content;
     min-height: fit-content;
 
+    margin: 0;
     padding: 20px;
     align-items: start;
+    box-sizing: border-box;
 }
 
 .background {
@@ -21,7 +23,6 @@
 }
 
 .container {
-    position: relative;
     padding: 10px 20px;
     box-sizing: border-box;
 
@@ -38,28 +39,11 @@
 .container-row {
     flex-direction: row;
     justify-content: start;
-    flex-wrap: wrap;
 }
 
 .container-col {
     flex-direction: column;
     align-items: stretch;
-}
-
-.full-width {
-    width: auto;
-}
-
-.full-height {
-    height: auto;
-}
-
-.container:not(.full-width) {
-    width: fit-content;
-}
-
-.container:not(.full-height) {
-    height: fit-content;
 }
 
 .container-centered {

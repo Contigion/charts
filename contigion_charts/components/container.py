@@ -11,7 +11,8 @@ def background():
 
 
 def container(children=None, class_name=''):
-    return Div(children, className=class_name)
+    classes = ' '.join(['container', class_name])
+    return Div(children, className=classes)
 
 
 def content_container_row(children=None, class_name=''):
