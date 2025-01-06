@@ -1,44 +1,45 @@
-import dash
-from dash.dependencies import Input, Output, State
+from datetime import datetime
 
+from dash import register_page, callback, Output, Input, State
 from contigion_metatrader import get_timeframe_value, get_market_data, get_symbol_names, get_timeframes
-from contigion_charts.components import (page, container_row, content_container_col, dropdown, number_input, get_chart,
-                                         button, title, checklist, icon_button, text, content_container_row)
+from dash.html import Div
 
-dash.register_page(__name__,
-                   path='/',
-                   title='Contigion Charts',
-                   name='charts'
-                   )
+from contigion_charts.components import (page, container_row, content_container_col, dropdown, number_input, get_chart,
+                                         button, title, checklist, icon_button, text, content_container_row, container,
+                                         container_col)
+
+register_page(__name__, path='/', title='Contigion Charts', name='charts')
 
 
 def layout():
     symbol = 'USDJPYmicro'
-    timeframe = get_timeframe_value('M15')
+    timeframe = 'M15'
     n_candles = 500
     step = 10
-    data = get_market_data(symbol, timeframe, n_candles)
+    data = get_market_data(symbol, get_timeframe_value(timeframe), n_candles)
 
     symbols = get_symbol_names()
     timeframes = get_timeframes()
-    indicators = [{'label': 'A', 'value': 'A'},{'label': 'B', 'value': 'B'},{'label': 'C', 'value': 'C'},]
+    indicators = [{'label': 'A', 'value': 'A'}, {'label': 'B', 'value': 'B'}, {'label': 'C', 'value': 'C'}, ]
 
-    chart_title = container_row([
-        title('chart-title', f'{symbol} {timeframe} Chart', 'bold-text')
+    chart_container = container([
+        get_chart(symbol, data),
     ])
+    chart_container.id = 'chart-container'
 
-    side_panel = content_container_col(children=[
+    chart_params = content_container_col(children=[
         dropdown('symbol-dropdown', 'Symbol', symbol, symbols, 'bold-text'),
         dropdown('timeframe-dropdown', 'Timeframes', timeframe, timeframes, 'bold-text'),
-        number_input('n-candles-input', 'Number of Candles', n_candles, step, minimum=n_candles, class_name='bold-text'),
+        number_input('n-candles-input', 'Number of Candles', n_candles, step, minimum=10,
+                     class_name='bold-text'),
         button('update-chart', 'Update Chart')
     ])
 
-    side_panel_2 = content_container_col(children=[
+    indicator_panel = content_container_col(children=[
         checklist('indicator-checklist', 'Indicators', [], indicators, 'bold-text')
     ])
 
-    side_panel_3 = content_container_row(children=[
+    control_panel = content_container_row(children=[
         icon_button('controls-previous', 'bi bi-rewind-fill'),
         icon_button('controls-play', 'bi bi-play-fill'),
         icon_button('controls-stop', 'bi bi-stop-fill'),
@@ -49,11 +50,16 @@ def layout():
     ], class_name='container-centered')
 
     home_content = container_row(children=[
-        get_chart(symbol, data),
-        side_panel,
-        side_panel_2,
-        side_panel_3
+        chart_container,
+        chart_params,
+        indicator_panel,
+        control_panel
     ], class_name='full-width full-height')
+
+    chart_title = container([
+        title('chart-title', f'{symbol} {timeframe} Chart', 'bold-text'),
+        text('chart-last-update', f'{get_current_time()}', 'white')
+    ])
 
     home_page = page(page_id='home-page', children=[
         chart_title,
@@ -63,22 +69,31 @@ def layout():
     return home_page
 
 
-# def layout():
-#     page = html.Div([
-#         comp.background(),
-#         html.P("Sandbox", className="page-title"),
-#         comp.chart_options_row(),
-#
-#         html.Div([
-#             html.P("", id="sandbox-chart-title", className="page-title"),
-#             html.Button('Refresh Chart', id='refresh-chart-button', className='control-button purple', n_clicks=0)
-#         ], className="row-container"),
-#
-#         html.Div([], className="chart-container", id="sandbox-graph-container"),
-#
-#     ], className="page")
-#
-#     return page
+@callback(
+    [
+        Output('chart-title', 'children'),
+        Output('chart-last-update', 'children'),
+        Output('chart-container', 'children')
+
+    ],
+    Input('update-chart', 'n_clicks'),
+    State('symbol-dropdown', 'value'),
+    State('timeframe-dropdown', 'value'),
+    State('n-candles-input', 'value'),
+    prevent_initial_call=True
+)
+def update_chart(_, symbol, timeframe, n_candles):
+    if symbol is None or timeframe is None or n_candles is None:
+        raise ValueError(f"{__file__}: {update_chart.__name__}\n"
+                         f"Unable to update chart: symbol={symbol}, timeframe={timeframe}, n_candles={n_candles}\n")
+
+    chart_title = f"{symbol} {timeframe} Chart"
+    last_update = get_current_time()
+
+    data = get_market_data(symbol, get_timeframe_value(timeframe), n_candles)
+    chart = get_chart(symbol, data)
+
+    return [chart_title], [last_update], [chart]
 
 
 # @dash.callback(
@@ -98,3 +113,11 @@ def layout():
 #     timeframe = get_timeframe_value()[timeframe]
 #
 #     return chart_title, comp.sandbox_chart(symbol, timeframe, strategy, candles)
+
+def get_current_time():
+    current_date = datetime.now()
+    current_time = current_date.strftime('%H:%M:%S')
+    current_day = current_date.strftime('%a')
+    current_date_str = current_date.strftime('%d %b')
+
+    return f"{current_day}, {current_date_str} - {current_time}"
