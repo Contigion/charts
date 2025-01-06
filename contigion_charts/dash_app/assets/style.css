@@ -10,3 +10,10 @@
     border: 0;
 }
 
+.green-icon-button:hover {
+    color: #22d522;
+}
+
+.red-icon-button:hover {
+    color: #cc1010;
+}

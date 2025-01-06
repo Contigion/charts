@@ -41,11 +41,10 @@ def layout():
 
     control_panel = content_container_row(children=[
         icon_button('controls-previous', 'bi bi-rewind-fill'),
-        icon_button('controls-play', 'bi bi-play-fill'),
-        icon_button('controls-stop', 'bi bi-stop-fill'),
+        icon_button('controls-play-stop', 'bi bi-play-fill green-icon-button'),
         icon_button('controls-next', 'bi bi-fast-forward-fill'),
         icon_button('controls-decrease', 'bi bi-dash'),
-        text('controls-increase', 'Speed x1'),
+        text('controls-current-index', 'Candle 0'),
         icon_button('controls-increase', 'bi bi-plus'),
     ], class_name='container-centered')
 
@@ -96,23 +95,80 @@ def update_chart(_, symbol, timeframe, n_candles):
     return [chart_title], [last_update], [chart]
 
 
-# @dash.callback(
-#     [Output('sandbox-chart-title', 'children'),
-#      Output('sandbox-graph-container', 'children')],
-#     Input('refresh-chart-button', 'n_clicks'),
-#     State('symbol-dropdown', 'value'),
-#     State('timeframe-dropdown', 'value'),
-#     State('strategy-dropdown', 'value'),
-#     State('number-candles-input', 'value')
-# )
-# def graph(n_clicks, symbol, timeframe, strategy, number_of_candles):
-#     chart_title = f"{symbol} {timeframe} Chart"
-#
-#     adjust = 6
-#     candles = int(number_of_candles) + adjust
-#     timeframe = get_timeframe_value()[timeframe]
-#
-#     return chart_title, comp.sandbox_chart(symbol, timeframe, strategy, candles)
+@callback(
+    Input('controls-previous', 'n_clicks'),
+    prevent_initial_call=True
+)
+def controls_previos(n_clicks):
+    print('previous <<')
+
+
+@callback(
+    Input('controls-next', 'n_clicks'),
+    prevent_initial_call=True
+)
+def controls_next(n_clicks):
+    print('next >>')
+
+
+@callback(
+    Output('controls-play-stop', 'className'),
+    Input('controls-play-stop', 'n_clicks'),
+    State('controls-play-stop', 'className'),
+    prevent_initial_call=True
+)
+def controls_play_stop(_, current_classes):
+    classes = current_classes
+
+    if 'play' in current_classes:
+        classes = current_classes.replace('play', 'stop').replace('green', 'red')
+        return classes
+
+    elif 'stop' in current_classes:
+        classes = current_classes.replace('stop', 'play').replace('red', 'green')
+        return classes
+
+    return classes
+
+
+@callback(
+    Output('controls-current-index', 'children'),
+    Input('controls-decrease', 'n_clicks'),
+    State('controls-current-index', 'children'),
+    prevent_initial_call=True
+)
+def controls_decrease(_, component_text):
+    c = component_text.split(' ')
+    prefix = c[0]
+    index = int(c[1])
+
+    if index > 0:
+        return f'{prefix} {index - 1}'
+
+    return component_text
+
+
+@callback(
+    Output('controls-current-index', 'children'),
+    Input('controls-increase', 'n_clicks'),
+    State('controls-current-index', 'children'),
+    State('n-candles-input', 'value'),
+    prevent_initial_call=True
+)
+def controls_increase(_, component_text, n_candles):
+    if n_candles is None:
+        raise ValueError(f"{__file__}: {update_chart.__name__}\n"
+                         f"Unable to update index: n_candles={n_candles}\n")
+
+    c = component_text.split(' ')
+    prefix = c[0]
+    index = int(c[1])
+
+    if (index + 1) < n_candles:
+        return f'{prefix} {index + 1}'
+
+    return component_text
+
 
 def get_current_time():
     current_date = datetime.now()
