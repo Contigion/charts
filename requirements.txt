@@ -1,5 +1,7 @@
 pandas
 pandas_ta
-numpy==1.26.4
+numpy
 MetaTrader5
 pytest
+dash
+plotly~=5.24.1

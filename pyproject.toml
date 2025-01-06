@@ -22,4 +22,4 @@ classifiers = [
 ]
 
 [tool.setuptools]
-packages = ["contigion_charts"]
+packages = ["contigion_charts", "contigion_charts.pages", "contigion_charts.components", "contigion_charts.dash_app"]

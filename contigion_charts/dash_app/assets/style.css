@@ -1,5 +1,12 @@
+* {
+    margin: 0;
+    border: 0;
+    padding: 0;
+}
+
 .component {
     margin: 5px;
     padding: 5px 20px;
     border: 0;
 }
+

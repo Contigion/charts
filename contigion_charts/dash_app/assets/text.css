@@ -12,3 +12,15 @@ a {
     color: #1275cc;
     text-decoration: none;
 }
+
+.bold-text {
+    font-weight: bold;
+}
+
+.white {
+    color: #ffffff;
+}
+
+.black {
+    color: #000000;
+}
