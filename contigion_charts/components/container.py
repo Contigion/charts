@@ -1,9 +1,9 @@
 from dash.html import Div
 
 
-def page(children=None, className=''):
-    classes = ' '.join(['container page', className])
-    return Div(children, className=classes)
+def page(page_id, children=None, className=''):
+    classes = ' '.join(['container page full-height full-width container-col', className])
+    return Div(children, id=page_id, className=classes)
 
 
 def background():
