@@ -1,41 +1,148 @@
+from pandas import date_range
 from MetaTrader5 import symbol_info_tick
 import plotly.graph_objects as go
+from contigion_indicators import sma_crossover, bollinger_bands
 from dash.dcc import Graph
 
 from contigion_charts.components.config import (BACKGROUND, BULLISH_CANDLE_FILL, BULLISH_CANDLE_OUTLINE,
                                                 BEARISH_CANDLE_FILL, BEARISH_CANDLE_OUTLINE, BLACK, RED, YELLOW_LIME,
-                                                SKY_BLUE, ORANGE)
+                                                SKY_BLUE, ORANGE, MAIN_PURPLE, DARK_RED, LIME_GREEN, MAIN_PINK,
+                                                MAIN_BLUE)
 from contigion_charts.dash_app.util.indicators import get_indicator_function
+
+BULL = SKY_BLUE
+BEAR = ORANGE
 
 
 def get_chart(symbol, data, indicators):
-    # Tick data
-    tick = symbol_info_tick(symbol)
-
-    # Chart
     chart = go.Figure(
         data=[
-            go.Candlestick(x=data.index, open=data['open'], high=data['high'], low=data['low'], close=data['close'])])
+            go.Candlestick(
+                x=data['time'],
+                open=data['open'],
+                high=data['high'],
+                low=data['low'],
+                close=data['close']
+            )
+        ]
+    )
 
-    # Combine plots
     for indicator in indicators:
+        if indicator == 'SMA Crossover':
+            plot_sma_crossover(data, 5, 13, chart)
+
+        elif indicator == 'Bollinger Bands':
+            plot_bollinger_bands(data, 5, chart)
+
         func = get_indicator_function(indicator)
         result = func(data)
 
-        if indicator == 'SMA Crossover':
-            chart.add_trace(go.Scatter(x=result.index, y=result['sma_slow'], mode='lines',
-                                       marker=dict(color=RED), name='Slow SMA'))
-            chart.add_trace(go.Scatter(x=result.index, y=result['sma_fast'], mode='lines',
-                                       marker=dict(color=YELLOW_LIME), name='Fast Sma'))
+        if indicator == 'Supertrend':
+            plot_supertrend(result, chart, indicator)
+            continue
 
-        buy_signals = result[result['signal'] == 'buy']
-        sell_signals = result[result['signal'] == 'sell']
+        elif indicator == 'PSAR':
+            plot_psar(result, chart, indicator)
+            continue
 
-        chart.add_trace(go.Scatter(x=buy_signals.index, y=buy_signals['close'], mode='markers',
-                                   marker=dict(color=SKY_BLUE), name='Buy'))
-        chart.add_trace(go.Scatter(x=sell_signals.index, y=sell_signals['close'], mode='markers',
-                                   marker=dict(color=ORANGE), name='Sell'))
+        elif indicator == 'Support and Resistence':
+            plot_snr(result, chart)
+            continue
 
+        elif indicator == 'Candle Type' or indicator == 'Candle Patterns (1x)' or indicator == 'Candle Patterns (2x)' or indicator == 'Candle Patterns (3x)':
+            plot_candlestick_pattern(result, chart)
+            continue
+
+        plot_signals(result, chart, indicator)
+
+    plot_current_price(symbol, chart)
+    configure_chart(chart)
+    remove_breaks(data, chart)
+
+    graph = Graph(
+        figure=chart,
+        config={'displayModeBar': True, 'scrollZoom': True},
+        className='graph'
+    )
+
+    return graph
+
+
+def plot_sma_crossover(data, fast, slow, chart):
+    sma_data = sma_crossover(data, fast, slow)
+    add_line_plot(sma_data, 'sma_slow', chart, RED, f'Slow Sma {slow}')
+    add_line_plot(sma_data, 'sma_fast', chart, YELLOW_LIME, f'Fast Sma {fast}')
+
+
+def plot_bollinger_bands(data, period, chart):
+    bb_data = bollinger_bands(data, period)
+    add_line_plot(bb_data, 'lower', chart, MAIN_PINK, 'BB Lower')
+    add_line_plot(bb_data, 'upper', chart, MAIN_PINK, 'BB Upper')
+    add_line_plot(bb_data, 'mavg', chart, MAIN_PINK, 'BB Middle')
+
+
+def plot_supertrend(data, chart, plot_name):
+    add_line_plot(data, 'supertrend', chart, MAIN_BLUE, plot_name)
+
+
+def plot_psar(data, chart, plot_name):
+    add_scatter_plot(data, 'psar_up', chart, MAIN_PURPLE, plot_name)
+    add_scatter_plot(data, 'psar_down', chart, MAIN_PURPLE, plot_name)
+
+
+def plot_snr(data, chart):
+    _, support, resistance = data
+    add_scatter_plot(support, 'level', chart, LIME_GREEN, 'Support')
+    add_scatter_plot(resistance, 'level', chart, DARK_RED, 'Resistance')
+
+
+def plot_candlestick_pattern(data, chart):
+    plot_signals(data, chart, 'Pattern', 'pattern')
+
+
+def plot_signals(data, chart, plot_name, point_label=None):
+    buy_signals = data[data['signal'] == 'buy']
+    sell_signals = data[data['signal'] == 'sell']
+    buy_label = buy_signals[point_label] if point_label else ''
+    sell_label = sell_signals[point_label] if point_label else ''
+
+    add_scatter_plot(buy_signals, 'close', chart, BULL, f'Buy {plot_name}', buy_label)
+    add_scatter_plot(sell_signals, 'close', chart, BEAR, f'Sell {plot_name}', sell_label)
+
+
+def plot_current_price(symbol, chart):
+    tick = symbol_info_tick(symbol)
+
+    chart.add_hline(y=tick.ask, line_width=1, line_color=BULL)
+    chart.add_hline(y=tick.bid, line_width=1, line_color=BEAR)
+
+
+def add_line_plot(data, label, chart, color, plot_name):
+    chart.add_trace(
+        go.Scatter(
+            x=data['time'],
+            y=data[label],
+            mode='lines',
+            marker=dict(color=color),
+            name=plot_name
+        )
+    )
+
+
+def add_scatter_plot(data, label, chart, color, plot_name, point_label=''):
+    chart.add_trace(
+        go.Scatter(
+            x=data['time'],
+            y=data[label],
+            mode='markers',
+            marker=dict(color=color),
+            name=plot_name,
+            text=point_label
+        )
+    )
+
+
+def configure_chart(chart):
     # Background colour
     chart.update_layout(paper_bgcolor=BACKGROUND)
     chart.update_layout(plot_bgcolor=BACKGROUND)
@@ -51,12 +158,20 @@ def get_chart(symbol, data, indicators):
     cs.decreasing.fillcolor = BEARISH_CANDLE_FILL
     cs.decreasing.line.color = BEARISH_CANDLE_OUTLINE
 
-    # Add current price
-    chart.add_hline(y=tick.ask, line_width=1, line_color=BLACK)
-    chart.add_hline(y=tick.bid, line_width=1, line_color=BLACK)
-
-    chart.update_layout(xaxis_rangeslider_visible=False, yaxis={'side': 'right'}, dragmode='pan')
+    chart.update_layout(xaxis_rangeslider_visible=False, yaxis={'side': 'left'}, dragmode='pan')
     chart.layout.xaxis.fixedrange = False
     chart.layout.yaxis.fixedrange = False
 
-    return Graph(figure=chart, config={'displayModeBar': True, 'scrollZoom': True}, className='graph')
+
+def remove_breaks(data, chart):
+    time_diffs = data['time'].diff().dropna()
+    interval = time_diffs.min()
+
+    full_range = date_range(start=data['time'].min(), end=data['time'].max(), freq=interval)
+    missing_timestamps = full_range.difference(data['time'])
+
+    chart.update_xaxes(
+        rangebreaks=[
+            dict(values=missing_timestamps.strftime('%Y-%m-%d %H:%M:%S').tolist())
+        ]
+    )
