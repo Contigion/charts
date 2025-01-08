@@ -1,12 +1,15 @@
-from dash import register_page, callback, Output, Input, State, callback_context
+from dash import register_page, callback, Output, Input, State, callback_context, no_update
+from dash.dcc import Interval
 from contigion_metatrader import get_timeframe_value, get_market_data, get_symbol_names, get_timeframes
 
 from contigion_charts.components import (page, container_row, content_container_col, dropdown, number_input, get_chart,
                                          button, title, checklist, icon_button, text, content_container_row, container,
                                          container_col, sub_heading)
-from contigion_charts.dash_app.util import get_current_time
-from contigion_charts.dash_app.util.home_callbacks import candlestick_index_callback, play_stop_callback
-from contigion_charts.dash_app.util.indicators import get_indicators
+from contigion_charts.components.button import switch
+from contigion_charts.config import CHART_REFRESH_INTERVAL_MS
+from contigion_charts.util import get_current_time
+from contigion_charts.util import candlestick_index_callback, play_stop_callback
+from contigion_charts.util.indicators import get_indicators
 
 register_page(__name__, path='/', title='Contigion Charts', name='charts')
 
@@ -29,6 +32,7 @@ def layout():
         dropdown('timeframe-dropdown', 'Timeframes', timeframe, timeframes, 'bold-text'),
         number_input('n-candles-input', 'Number of Candles', n_candles, step, minimum=10,
                      class_name='bold-text'),
+        switch('live-switch', 'Live Chart'),
         button('update-chart', 'Update Chart')
     ])
 
@@ -67,7 +71,8 @@ def layout():
 
     home_page = page(page_id='home-page', children=[
         chart_title,
-        home_content
+        home_content,
+        Interval('chart-refresh', interval=CHART_REFRESH_INTERVAL_MS)
     ])
 
     return home_page
@@ -77,17 +82,24 @@ def layout():
     Output('chart-title', 'children'),
     Output('chart-last-update', 'children'),
     Output('chart-container', 'children'),
-    Input('update-chart', 'n_clicks'),
+    [Input('update-chart', 'n_clicks'),
+     Input('chart-refresh', 'n_intervals')],
     State('symbol-dropdown', 'value'),
     State('timeframe-dropdown', 'value'),
     State('n-candles-input', 'value'),
     State('indicator-checklist', 'value'),
+    State('live-switch', 'on'),
     prevent_initial_call=True
 )
-def update_chart(_, symbol, timeframe, n_candles, selected_indicators):
+def update_chart(_, __, symbol, timeframe, n_candles, selected_indicators, is_live_update):
     if (symbol is None) or (timeframe is None) or (n_candles is None):
         raise ValueError(f"{__file__}: {update_chart.__name__}\n"
                          f"Unable to update chart: symbol={symbol}, timeframe={timeframe}, n_candles={n_candles}\n")
+
+    triggered_context = callback_context.triggered[0]['prop_id'].split('.')[0]
+
+    if not is_live_update and triggered_context == 'chart-refresh':
+        return no_update, no_update, no_update
 
     indicators = [indicator for indicator in selected_indicators if indicator]
 

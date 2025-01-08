@@ -56,10 +56,17 @@
 
 .left {
     overflow: hidden;
+    min-width: 380px;
     flex: 7;
 }
 
 .right {
     overflow: hidden;
+    min-width: 380px;
     flex: 3;
+}
+
+.switch-container {
+    justify-content: space-between !important;
+    align-items: center;
 }

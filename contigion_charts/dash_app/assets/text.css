@@ -10,6 +10,7 @@ a {
 }
 
 .text:not(a),
+.switch p,
 .input-label{
     color: #303030;
     cursor: default;
@@ -17,6 +18,11 @@ a {
 
 .bold-text {
     font-weight: bold;
+}
+
+.switch-container p {
+    padding-left: 0;
+    margin-left: 0;
 }
 
 .icon {
