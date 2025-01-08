@@ -49,12 +49,12 @@ def layout():
     ], class_name='container-centered')
 
     chart_title = container_col([
-        title('chart-title', f'{symbol} {timeframe} Chart', 'bold-text'),
+        title('chart-title', f'{SYMBOL} {TIMEFRAME} Chart', 'bold-text'),
         sub_heading('chart-last-update', f'{get_current_time()}')
     ])
 
     chart_container = container([
-        get_chart(symbol, data, []),
+        get_chart(SYMBOL, data, []),
     ], class_name='left')
     chart_container.id = 'chart-container'
 
