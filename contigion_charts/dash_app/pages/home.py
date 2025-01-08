@@ -21,7 +21,7 @@ STEP = 10
 
 
 def layout():
-    data = get_market_data(SYMBOL, get_timeframe_value(TIMEFRAME), N_CANDLES)
+    data = get_market_data(SYMBOL, get_timeframe_value(TIMEFRAME), N_CANDLES, False)
 
     symbols = get_symbol_names()
     timeframes = get_timeframes()
@@ -106,7 +106,7 @@ def update_chart(_, __, symbol, timeframe, n_candles, selected_indicators, is_li
     chart_title = f"{symbol} {timeframe} Chart"
     last_update = get_current_time()
 
-    data = get_market_data(symbol, get_timeframe_value(timeframe), n_candles)
+    data = get_market_data(symbol, get_timeframe_value(timeframe), n_candles, False)
     chart = get_chart(symbol, data, indicators)
 
     return chart_title, last_update, chart
