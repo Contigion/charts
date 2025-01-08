@@ -25,7 +25,7 @@ classifiers = [
 packages = [
     "contigion_charts",
     "contigion_charts.components",
+    "contigion_charts.util",
     "contigion_charts.dash_app",
-    "contigion_charts.dash_app.pages",
-    "contigion_charts.dash_app.util"
+    "contigion_charts.dash_app.pages"
 ]
