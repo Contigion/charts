@@ -1,5 +1,4 @@
 pandas
-pandas_ta
 numpy<2.0.0
 MetaTrader5
 pytest

@@ -1,14 +1,11 @@
 from pandas import date_range
-from MetaTrader5 import symbol_info_tick
 import plotly.graph_objects as go
 from dash.dcc import Graph
 from contigion_charts.config import (BACKGROUND, BULLISH_CANDLE_FILL, BULLISH_CANDLE_OUTLINE, BEARISH_CANDLE_FILL,
-                                     BEARISH_CANDLE_OUTLINE, RED, YELLOW_LIME, SKY_BLUE, ORANGE, MAIN_PURPLE,
-                                     LIME_GREEN, MAIN_PINK, MAIN_BLUE, SMA_FAST, SMA_SLOW, BOLLINGER_BANDS_PERIOD)
+                                     BEARISH_CANDLE_OUTLINE, SMA_FAST, SMA_SLOW, BOLLINGER_BANDS_PERIOD)
+from contigion_charts.util.graph import (plot_sma_crossover, plot_bollinger_bands, plot_supertrend, plot_psar, plot_snr,
+                                         plot_signals, plot_current_price)
 from contigion_charts.util.indicators import get_indicator_function
-
-BULL = SKY_BLUE
-BEAR = ORANGE
 
 
 def get_chart(symbol, data, indicators):
@@ -64,76 +61,6 @@ def get_chart(symbol, data, indicators):
     )
 
     return graph
-
-
-def plot_sma_crossover(function, data, fast, slow, chart):
-    sma_data = function(data, fast, slow)
-    add_line_plot(sma_data, 'sma_slow', chart, RED, f'Slow Sma {slow}')
-    add_line_plot(sma_data, 'sma_fast', chart, YELLOW_LIME, f'Fast Sma {fast}')
-
-
-def plot_bollinger_bands(function, data, period, chart):
-    bb_data = function(data, period)
-    add_line_plot(bb_data, 'lower', chart, MAIN_PINK, 'BB Lower')
-    add_line_plot(bb_data, 'upper', chart, MAIN_PINK, 'BB Upper')
-    add_line_plot(bb_data, 'mavg', chart, MAIN_PINK, 'BB Middle')
-
-
-def plot_supertrend(data, chart, plot_name):
-    add_line_plot(data, 'supertrend', chart, MAIN_BLUE, plot_name)
-
-
-def plot_psar(data, chart, plot_name):
-    add_scatter_plot(data, 'psar_up', chart, MAIN_PURPLE, plot_name)
-    add_scatter_plot(data, 'psar_down', chart, MAIN_PURPLE, plot_name)
-
-
-def plot_snr(data, chart):
-    _, support, resistance = data
-    add_scatter_plot(support, 'level', chart, LIME_GREEN, 'Support')
-    add_scatter_plot(resistance, 'level', chart, RED, 'Resistance')
-
-
-def plot_signals(data, chart, plot_name, point_label=None):
-    buy_signals = data[data['signal'] == 'buy']
-    sell_signals = data[data['signal'] == 'sell']
-    buy_label = buy_signals[point_label] if point_label else ''
-    sell_label = sell_signals[point_label] if point_label else ''
-
-    add_scatter_plot(buy_signals, 'close', chart, BULL, f'Buy {plot_name}', buy_label)
-    add_scatter_plot(sell_signals, 'close', chart, BEAR, f'Sell {plot_name}', sell_label)
-
-
-def plot_current_price(symbol, chart):
-    tick = symbol_info_tick(symbol)
-
-    chart.add_hline(y=tick.ask, line_width=1, line_color=BULL)
-    chart.add_hline(y=tick.bid, line_width=1, line_color=BEAR)
-
-
-def add_line_plot(data, label, chart, color, plot_name):
-    chart.add_trace(
-        go.Scatter(
-            x=data['time'],
-            y=data[label],
-            mode='lines',
-            marker=dict(color=color),
-            name=plot_name
-        )
-    )
-
-
-def add_scatter_plot(data, label, chart, color, plot_name, point_label=''):
-    chart.add_trace(
-        go.Scatter(
-            x=data['time'],
-            y=data[label],
-            mode='markers',
-            marker=dict(color=color),
-            name=plot_name,
-            text=point_label
-        )
-    )
 
 
 def configure_chart(chart):
