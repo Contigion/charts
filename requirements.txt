@@ -1,5 +1,10 @@
 pandas
-pandas_ta
-numpy==1.26.4
+numpy<2.0.0
 MetaTrader5
 pytest
+plotly~=5.24.1
+dash
+dash-daq
+dash-bootstrap-components
+contigion-indicators
+contigion-metatrader

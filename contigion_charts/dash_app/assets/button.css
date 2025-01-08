@@ -1,0 +1,29 @@
+.button {
+    border-radius: 5px;
+
+    background-color: #02203b;
+    color: #ffffff;
+    transition: ease-in 0.3s;
+}
+
+.icon-button {
+    cursor: pointer;
+    transition: ease-in 0.3s;
+}
+
+.icon-button:hover {
+    color: #0b6ecc;
+}
+
+.button:hover {
+    background-color: #074f93;
+}
+
+.green-icon-button:hover {
+    color: #22d522;
+}
+
+.red-icon-button:hover {
+    color: #cc1010;
+}
+
