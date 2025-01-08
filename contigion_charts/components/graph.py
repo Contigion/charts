@@ -1,14 +1,11 @@
 from pandas import date_range
 from MetaTrader5 import symbol_info_tick
 import plotly.graph_objects as go
-from contigion_indicators import sma_crossover, bollinger_bands
 from dash.dcc import Graph
-
-from contigion_charts.components.config import (BACKGROUND, BULLISH_CANDLE_FILL, BULLISH_CANDLE_OUTLINE,
-                                                BEARISH_CANDLE_FILL, BEARISH_CANDLE_OUTLINE, BLACK, RED, YELLOW_LIME,
-                                                SKY_BLUE, ORANGE, MAIN_PURPLE, DARK_RED, LIME_GREEN, MAIN_PINK,
-                                                MAIN_BLUE)
-from contigion_charts.dash_app.util.indicators import get_indicator_function
+from contigion_charts.config import (BACKGROUND, BULLISH_CANDLE_FILL, BULLISH_CANDLE_OUTLINE, BEARISH_CANDLE_FILL,
+                                     BEARISH_CANDLE_OUTLINE, RED, YELLOW_LIME, SKY_BLUE, ORANGE, MAIN_PURPLE,
+                                     LIME_GREEN, MAIN_PINK, MAIN_BLUE, SMA_FAST, SMA_SLOW, BOLLINGER_BANDS_PERIOD)
+from contigion_charts.util.indicators import get_indicator_function
 
 BULL = SKY_BLUE
 BEAR = ORANGE
@@ -28,14 +25,16 @@ def get_chart(symbol, data, indicators):
     )
 
     for indicator in indicators:
+        function = get_indicator_function(indicator)
+
         if indicator == 'SMA Crossover':
-            plot_sma_crossover(data, 5, 13, chart)
+            plot_sma_crossover(function, data, SMA_FAST, SMA_SLOW, chart)
 
         elif indicator == 'Bollinger Bands':
-            plot_bollinger_bands(data, 5, chart)
+            plot_bollinger_bands(function, data, BOLLINGER_BANDS_PERIOD, chart)
 
-        func = get_indicator_function(indicator)
-        result = func(data)
+        result = function(data)
+        point_label = ''
 
         if indicator == 'Supertrend':
             plot_supertrend(result, chart, indicator)
@@ -49,11 +48,10 @@ def get_chart(symbol, data, indicators):
             plot_snr(result, chart)
             continue
 
-        elif indicator == 'Candle Type' or indicator == 'Candle Patterns (1x)' or indicator == 'Candle Patterns (2x)' or indicator == 'Candle Patterns (3x)':
-            plot_candlestick_pattern(result, chart)
-            continue
+        elif indicator in ['Candle Type', 'Candle Patterns (1x)', 'Candle Patterns (2x)', 'Candle Patterns (3x)']:
+            point_label = 'pattern'
 
-        plot_signals(result, chart, indicator)
+        plot_signals(result, chart, indicator, point_label)
 
     plot_current_price(symbol, chart)
     configure_chart(chart)
@@ -68,14 +66,14 @@ def get_chart(symbol, data, indicators):
     return graph
 
 
-def plot_sma_crossover(data, fast, slow, chart):
-    sma_data = sma_crossover(data, fast, slow)
+def plot_sma_crossover(function, data, fast, slow, chart):
+    sma_data = function(data, fast, slow)
     add_line_plot(sma_data, 'sma_slow', chart, RED, f'Slow Sma {slow}')
     add_line_plot(sma_data, 'sma_fast', chart, YELLOW_LIME, f'Fast Sma {fast}')
 
 
-def plot_bollinger_bands(data, period, chart):
-    bb_data = bollinger_bands(data, period)
+def plot_bollinger_bands(function, data, period, chart):
+    bb_data = function(data, period)
     add_line_plot(bb_data, 'lower', chart, MAIN_PINK, 'BB Lower')
     add_line_plot(bb_data, 'upper', chart, MAIN_PINK, 'BB Upper')
     add_line_plot(bb_data, 'mavg', chart, MAIN_PINK, 'BB Middle')
@@ -93,11 +91,7 @@ def plot_psar(data, chart, plot_name):
 def plot_snr(data, chart):
     _, support, resistance = data
     add_scatter_plot(support, 'level', chart, LIME_GREEN, 'Support')
-    add_scatter_plot(resistance, 'level', chart, DARK_RED, 'Resistance')
-
-
-def plot_candlestick_pattern(data, chart):
-    plot_signals(data, chart, 'Pattern', 'pattern')
+    add_scatter_plot(resistance, 'level', chart, RED, 'Resistance')
 
 
 def plot_signals(data, chart, plot_name, point_label=None):
