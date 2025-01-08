@@ -45,7 +45,7 @@ def get_chart(symbol, data, indicators):
             plot_snr(result, chart)
             continue
 
-        elif indicator in ['Candle Type', 'Candle Patterns (1x)', 'Candle Patterns (2x)', 'Candle Patterns (3x)']:
+        if indicator in ['Candle Type', 'Candle Patterns (1x)', 'Candle Patterns (2x)', 'Candle Patterns (3x)']:
             point_label = 'pattern'
 
         plot_signals(result, chart, indicator, point_label)
