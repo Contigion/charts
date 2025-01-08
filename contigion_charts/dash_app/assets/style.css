@@ -17,6 +17,6 @@ html, body {
 
 
 .graph {
-    width: 2000px;
-    height: 80vh;
+    width: 100%;
+    height: auto;
 }

@@ -3,7 +3,7 @@ from contigion_metatrader import get_timeframe_value, get_market_data, get_symbo
 
 from contigion_charts.components import (page, container_row, content_container_col, dropdown, number_input, get_chart,
                                          button, title, checklist, icon_button, text, content_container_row, container,
-                                         container_col)
+                                         container_col, sub_heading)
 from contigion_charts.dash_app.util import get_current_time
 from contigion_charts.dash_app.util.home_callbacks import candlestick_index_callback, play_stop_callback
 from contigion_charts.dash_app.util.indicators import get_indicators
@@ -46,7 +46,7 @@ def layout():
 
     chart_title = container_col([
         title('chart-title', f'{symbol} {timeframe} Chart', 'bold-text'),
-        text('chart-last-update', f'{get_current_time()}')
+        sub_heading('chart-last-update', f'{get_current_time()}')
     ])
 
     chart_container = container([

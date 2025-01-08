@@ -41,6 +41,7 @@
 .container-row {
     flex-direction: row;
     justify-content: start;
+    flex-wrap: wrap;
 }
 
 .container-col {
@@ -51,4 +52,14 @@
 .container-centered {
     align-items: center;
     justify-content: center;
+}
+
+.left {
+    overflow: hidden;
+    flex: 7;
+}
+
+.right {
+    overflow: hidden;
+    flex: 3;
 }
