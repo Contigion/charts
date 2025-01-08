@@ -20,11 +20,11 @@ def add_plot(mode, data, label, chart, color, plot_name, point_label):
 
 
 def add_line_plot(data, label, chart, color, plot_name):
-    add_plot(data, label, chart, color, plot_name, '', 'lines')
+    add_plot('lines', data, label, chart, color, plot_name, '')
 
 
 def add_scatter_plot(data, label, chart, color, plot_name, point_label=''):
-    add_plot(data, label, chart, color, plot_name, '', 'markers')
+    add_plot('markers', data, label, chart, color, plot_name, '')
 
 
 def plot_sma_crossover(function, data, fast, slow, chart):
