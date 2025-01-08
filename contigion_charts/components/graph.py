@@ -37,11 +37,11 @@ def get_chart(symbol, data, indicators):
             plot_supertrend(result, chart, indicator)
             continue
 
-        elif indicator == 'PSAR':
+        if indicator == 'PSAR':
             plot_psar(result, chart, indicator)
             continue
 
-        elif indicator == 'Support and Resistence':
+        if indicator == 'Support and Resistence':
             plot_snr(result, chart)
             continue
 
@@ -93,6 +93,6 @@ def remove_breaks(data, chart):
 
     chart.update_xaxes(
         rangebreaks=[
-            dict(values=missing_timestamps.strftime('%Y-%m-%d %H:%M:%S').tolist())
+            {'values': missing_timestamps.strftime('%Y-%m-%d %H:%M:%S').tolist()}
         ]
     )

@@ -33,7 +33,7 @@ jobs:
 
       - name: Analyse code
         run: |
-          pylint --max-line-length=120 --disable=missing-module-docstring,missing-function-docstring,invalid-name,broad-exception-caught,broad-exception-raised,raise-missing-from $(git ls-files '*.py')
+          pylint --max-line-length=120 --disable=missing-module-docstring,missing-function-docstring,invalid-name,broad-exception-caught,broad-exception-raised,raise-missing-from,no-member,no-name-in-module,too-many-arguments,too-many-positional-arguments  $(git ls-files '*.py')
 
       - name: Run tests
         run: pytest

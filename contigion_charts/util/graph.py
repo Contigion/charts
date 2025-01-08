@@ -12,7 +12,7 @@ def add_plot(mode, data, label, chart, color, plot_name, point_label):
             x=data['time'],
             y=data[label],
             mode=mode,
-            marker=dict(color=color),
+            marker={'color': color},
             name=plot_name,
             text=point_label
         )
@@ -24,7 +24,7 @@ def add_line_plot(data, label, chart, color, plot_name):
 
 
 def add_scatter_plot(data, label, chart, color, plot_name, point_label=''):
-    add_plot('markers', data, label, chart, color, plot_name, '')
+    add_plot('markers', data, label, chart, color, plot_name, point_label)
 
 
 def plot_sma_crossover(function, data, fast, slow, chart):

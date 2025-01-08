@@ -6,7 +6,7 @@ from contigion_charts.components import (page, container_row, content_container_
                                          button, title, checklist, icon_button, text, content_container_row, container,
                                          container_col, sub_heading)
 from contigion_charts.components.button import switch
-from contigion_charts.config import CHART_REFRESH_INTERVAL_MS
+from contigion_charts.config import CHART_REFRESH_INTERVAL_MS, MIN_CANDLES
 from contigion_charts.util import get_current_time
 from contigion_charts.util import candlestick_index_callback, play_stop_callback
 from contigion_charts.util.indicators import get_indicators
@@ -14,23 +14,23 @@ from contigion_charts.util.indicators import get_indicators
 register_page(__name__, path='/', title='Contigion Charts', name='charts')
 
 # Defaults
-symbol = 'USDJPYmicro'
-timeframe = 'M15'
-n_candles = 500
-step = 10
+SYMBOL = 'USDJPYmicro'
+TIMEFRAME = 'M15'
+N_CANDLES = 500
+STEP = 10
 
 
 def layout():
-    data = get_market_data(symbol, get_timeframe_value(timeframe), n_candles)
+    data = get_market_data(SYMBOL, get_timeframe_value(TIMEFRAME), N_CANDLES)
 
     symbols = get_symbol_names()
     timeframes = get_timeframes()
     indicators = get_indicators()
 
     chart_params = content_container_col(children=[
-        dropdown('symbol-dropdown', 'Symbol', symbol, symbols, 'bold-text'),
-        dropdown('timeframe-dropdown', 'Timeframes', timeframe, timeframes, 'bold-text'),
-        number_input('n-candles-input', 'Number of Candles', n_candles, step, minimum=10,
+        dropdown('symbol-dropdown', 'Symbol', SYMBOL, symbols, 'bold-text'),
+        dropdown('timeframe-dropdown', 'Timeframes', TIMEFRAME, timeframes, 'bold-text'),
+        number_input('n-candles-input', 'Number of Candles', N_CANDLES, STEP, MIN_CANDLES,
                      class_name='bold-text'),
         switch('live-switch', 'Live Chart'),
         button('update-chart', 'Update Chart')
