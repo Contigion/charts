@@ -14,7 +14,7 @@ def get_current_time():
 
 
 def parse_csv_data(content):
-    content_type, content_string = content.split(',')
+    _, content_string = content.split(',')
     decoded = base64.b64decode(content_string)
     try:
         return read_csv(StringIO(decoded.decode('utf-8')))

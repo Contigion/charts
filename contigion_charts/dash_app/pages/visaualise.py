@@ -13,7 +13,7 @@ def layout():
     back_button = icon('test_to_home-icon', 'bi bi-arrow-left-circle-fill')
 
     page_title = container_col([
-        title('page-title', f'Visualise your data', 'bold-text'),
+        title('page-title', 'Visualise your data', 'bold-text'),
         paragraph('page-description', [
             'Import your csv to visualise your data on a chart. Your data needs to have the following columns: ',
             'time, open, high, low, close, '
