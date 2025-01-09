@@ -15,11 +15,11 @@ def candlestick_index_callback(context, component_text, n_candles):
     return component_text
 
 
-def play_stop_callback(current_classes):
+def play_pause_callback(current_classes):
     if 'play' in current_classes:
-        return current_classes.replace('play', 'stop').replace('green', 'red')
+        return current_classes.replace('play', 'pause').replace('green', 'yellow')
 
-    if 'stop' in current_classes:
-        return current_classes.replace('stop', 'play').replace('red', 'green')
+    if 'pause' in current_classes:
+        return current_classes.replace('pause', 'play').replace('yellow', 'green')
 
     return current_classes

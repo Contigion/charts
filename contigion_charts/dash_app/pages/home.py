@@ -8,7 +8,7 @@ from contigion_charts.components import (page, container_row, content_container_
 from contigion_charts.components.button import switch
 from contigion_charts.config import CHART_REFRESH_INTERVAL_MS, MIN_CANDLES
 from contigion_charts.util import get_current_time
-from contigion_charts.util import candlestick_index_callback, play_stop_callback
+from contigion_charts.util import candlestick_index_callback, play_pause_callback
 from contigion_charts.util.indicators import get_indicators
 
 register_page(__name__, path='/', title='Contigion Charts', name='charts')
@@ -42,7 +42,7 @@ def layout():
 
     control_panel = content_container_row(children=[
         icon_button('controls-restart', 'bi bi-arrow-clockwise'),
-        icon_button('controls-play-stop', 'bi bi-play-fill green-icon-button'),
+        icon_button('controls-play-pause', 'bi bi-play-fill green-icon-button'),
         icon_button('controls-decrease', 'bi bi-dash'),
         text('controls-current-index', 'Candle 0'),
         icon_button('controls-increase', 'bi bi-plus'),
@@ -113,13 +113,13 @@ def update_chart(_, __, symbol, timeframe, n_candles, selected_indicators, is_li
 
 
 @callback(
-    Output('controls-play-stop', 'className'),
-    Input('controls-play-stop', 'n_clicks'),
-    State('controls-play-stop', 'className'),
+    Output('controls-play-pause', 'className'),
+    Input('controls-play-pause', 'n_clicks'),
+    State('controls-play-pause', 'className'),
     prevent_initial_call=True
 )
-def controls_play_stop(_, current_classes):
-    return play_stop_callback(current_classes)
+def controls_play_pause(_, current_classes):
+    return play_pause_callback(current_classes)
 
 
 @callback(
