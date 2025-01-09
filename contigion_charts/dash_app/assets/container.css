@@ -56,13 +56,13 @@
 
 .left {
     overflow: hidden;
-    min-width: 380px;
+    min-width: 450px;
     flex: 7;
 }
 
 .right {
     overflow: hidden;
-    min-width: 380px;
+    min-width: 450px;
     flex: 3;
 }
 

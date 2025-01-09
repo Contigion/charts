@@ -30,6 +30,10 @@ def get_chart(symbol, data, indicators):
         elif indicator == 'Bollinger Bands':
             plot_bollinger_bands(function, data, BOLLINGER_BANDS_PERIOD, chart)
 
+        if indicator == 'Support and Resistence':
+            plot_snr(function, data, chart)
+            continue
+
         result = function(data)
         point_label = ''
 
@@ -41,9 +45,7 @@ def get_chart(symbol, data, indicators):
             plot_psar(result, chart, indicator)
             continue
 
-        if indicator == 'Support and Resistence':
-            plot_snr(result, chart)
-            continue
+
 
         if indicator in ['Candle Type', 'Candle Patterns (1x)', 'Candle Patterns (2x)', 'Candle Patterns (3x)']:
             point_label = 'pattern'

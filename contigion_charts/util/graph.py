@@ -1,6 +1,7 @@
 from plotly.graph_objects import Scatter
 from MetaTrader5 import symbol_info_tick
-from contigion_charts.config import RED, YELLOW_LIME, MAIN_PURPLE, LIME_GREEN, MAIN_PINK, MAIN_BLUE, SKY_BLUE, ORANGE
+from contigion_charts.config import (RED, YELLOW_LIME, MAIN_PURPLE, LIME_GREEN, MAIN_PINK, MAIN_BLUE, SKY_BLUE, ORANGE,
+                                     SUPPORT_AND_RESISTANCE_WINDOW)
 
 BULL = SKY_BLUE
 BEAR = ORANGE
@@ -49,8 +50,8 @@ def plot_psar(data, chart, plot_name):
     add_scatter_plot(data, 'psar_down', chart, MAIN_PURPLE, plot_name)
 
 
-def plot_snr(data, chart):
-    _, support, resistance = data
+def plot_snr(function, data, chart):
+    _, support, resistance = function(data, SUPPORT_AND_RESISTANCE_WINDOW)
     add_scatter_plot(support, 'level', chart, LIME_GREEN, 'Support')
     add_scatter_plot(resistance, 'level', chart, RED, 'Resistance')
 

@@ -4,7 +4,7 @@ from contigion_metatrader import get_timeframe_value, get_market_data, get_symbo
 
 from contigion_charts.components import (page, container_row, content_container_col, dropdown, number_input, get_chart,
                                          button, title, checklist, icon_button, text, content_container_row, container,
-                                         container_col, sub_heading)
+                                         container_col)
 from contigion_charts.components.button import switch
 from contigion_charts.config import CHART_REFRESH_INTERVAL_MS, MIN_CANDLES
 from contigion_charts.util import get_current_time
@@ -50,7 +50,7 @@ def layout():
 
     chart_title = container_col([
         title('chart-title', f'{SYMBOL} {TIMEFRAME} Chart', 'bold-text'),
-        sub_heading('chart-last-update', f'{get_current_time()}')
+        text('chart-last-update', f'{get_current_time()}')
     ])
 
     chart_container = container([
