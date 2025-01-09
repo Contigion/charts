@@ -1,10 +1,24 @@
-from plotly.graph_objects import Scatter
+from plotly.graph_objects import Scatter, Figure, Candlestick
 from MetaTrader5 import symbol_info_tick
 from contigion_charts.config import (RED, YELLOW_LIME, MAIN_PURPLE, LIME_GREEN, MAIN_PINK, MAIN_BLUE, SKY_BLUE, ORANGE,
-                                     SUPPORT_AND_RESISTANCE_WINDOW)
+                                     SUPPORT_AND_RESISTANCE_WINDOW, DARK_RED)
 
 BULL = SKY_BLUE
 BEAR = ORANGE
+
+
+def create_candlesticks_plot(data):
+    return Figure(
+        data=[
+            Candlestick(
+                x=data['time'],
+                open=data['open'],
+                high=data['high'],
+                low=data['low'],
+                close=data['close']
+            )
+        ]
+    )
 
 
 def add_plot(mode, data, label, chart, color, plot_name, point_label):
@@ -71,3 +85,18 @@ def plot_current_price(symbol, chart):
 
     chart.add_hline(y=tick.ask, line_width=1, line_color=BULL)
     chart.add_hline(y=tick.bid, line_width=1, line_color=BEAR)
+
+
+def plot_strategy(data):
+    chart = create_candlesticks_plot(data)
+
+    if 'point_y' in data.columns:
+        add_scatter_plot(data, 'point_y', chart, DARK_RED, 'Point')
+
+    if 'line_y' in data.columns:
+        add_line_plot(data, 'line_y', chart, YELLOW_LIME, 'Line')
+
+    if 'signal' in data.columns:
+        plot_signals(data, chart, 'Signal')
+
+    return chart

@@ -11,18 +11,24 @@ a {
 
 .text:not(a),
 .switch p,
-.input-label{
+.input-label {
     color: #303030;
     cursor: default;
+    width: fit-content;
 }
 
 .bold-text {
     font-weight: bold;
 }
 
-.switch-container p {
+.switch-container {
     padding-left: 0;
     margin-left: 0;
+}
+
+.upload p {
+    padding-left: 0;
+    margin-left: 5px;
 }
 
 .icon {

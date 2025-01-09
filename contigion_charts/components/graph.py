@@ -1,25 +1,14 @@
 from pandas import date_range
-import plotly.graph_objects as go
 from dash.dcc import Graph
 from contigion_charts.config import (BACKGROUND, BULLISH_CANDLE_FILL, BULLISH_CANDLE_OUTLINE, BEARISH_CANDLE_FILL,
                                      BEARISH_CANDLE_OUTLINE, SMA_FAST, SMA_SLOW, BOLLINGER_BANDS_PERIOD)
 from contigion_charts.util.graph import (plot_sma_crossover, plot_bollinger_bands, plot_supertrend, plot_psar, plot_snr,
-                                         plot_signals, plot_current_price)
+                                         plot_signals, plot_current_price, create_candlesticks_plot, plot_strategy)
 from contigion_charts.util.indicators import get_indicator_function
 
 
-def get_chart(symbol, data, indicators):
-    chart = go.Figure(
-        data=[
-            go.Candlestick(
-                x=data['time'],
-                open=data['open'],
-                high=data['high'],
-                low=data['low'],
-                close=data['close']
-            )
-        ]
-    )
+def live_chart(symbol, data, indicators):
+    chart = create_candlesticks_plot(data)
 
     for indicator in indicators:
         function = get_indicator_function(indicator)
@@ -45,8 +34,6 @@ def get_chart(symbol, data, indicators):
             plot_psar(result, chart, indicator)
             continue
 
-
-
         if indicator in ['Candle Type', 'Candle Patterns (1x)', 'Candle Patterns (2x)', 'Candle Patterns (3x)']:
             point_label = 'pattern'
 
@@ -55,6 +42,21 @@ def get_chart(symbol, data, indicators):
     plot_current_price(symbol, chart)
     configure_chart(chart)
     remove_breaks(data, chart)
+
+    graph = Graph(
+        figure=chart,
+        config={'displayModeBar': True, 'scrollZoom': True},
+        className='graph'
+    )
+
+    return graph
+
+
+def strategy_chart(data):
+    chart = plot_strategy(data)
+
+    configure_chart(chart)
+    # remove_breaks(data, chart)
 
     graph = Graph(
         figure=chart,
