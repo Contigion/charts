@@ -28,7 +28,7 @@
     border-color: #02203b;
 }
 
-.checklist *{
+.checklist * {
     display: flex !important;
     flex-direction: row;
     justify-content: flex-start;

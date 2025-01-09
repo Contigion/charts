@@ -1,14 +1,12 @@
 from dash import register_page, callback, Output, Input, State, callback_context, no_update
 from dash.dcc import Interval
 from contigion_metatrader import get_timeframe_value, get_market_data, get_symbol_names, get_timeframes
-
-from contigion_charts.components import (page, container_row, content_container_col, dropdown, number_input, get_chart,
-                                         button, title, checklist, icon_button, text, content_container_row, container,
-                                         container_col)
+from contigion_charts.components import (page, container_row, content_container_col, dropdown, number_input, live_chart,
+                                         button, title, checklist, text, content_container_row, container,
+                                         container_col, link)
 from contigion_charts.components.button import switch
 from contigion_charts.config import CHART_REFRESH_INTERVAL_MS, MIN_CANDLES
 from contigion_charts.util import get_current_time
-from contigion_charts.util import candlestick_index_callback, play_pause_callback
 from contigion_charts.util.indicators import get_indicators
 
 register_page(__name__, path='/', title='Contigion Charts', name='charts')
@@ -22,10 +20,14 @@ STEP = 10
 
 def layout():
     data = get_market_data(SYMBOL, get_timeframe_value(TIMEFRAME), N_CANDLES, False)
-
     symbols = get_symbol_names()
     timeframes = get_timeframes()
     indicators = get_indicators()
+
+    chart_title = container_col([
+        title('chart-title', f'{SYMBOL} {TIMEFRAME} Chart', 'bold-text'),
+        text('chart-last-update', f'{get_current_time()}')
+    ])
 
     chart_params = content_container_col(children=[
         dropdown('symbol-dropdown', 'Symbol', SYMBOL, symbols, 'bold-text'),
@@ -41,20 +43,11 @@ def layout():
     ])
 
     control_panel = content_container_row(children=[
-        icon_button('controls-restart', 'bi bi-arrow-clockwise'),
-        icon_button('controls-play-pause', 'bi bi-play-fill green-icon-button'),
-        icon_button('controls-decrease', 'bi bi-dash'),
-        text('controls-current-index', 'Candle 0'),
-        icon_button('controls-increase', 'bi bi-plus'),
+        link('visualise-your-data-button', 'Visualise your strategy', '/visualise', 'button')
     ], class_name='container-centered')
 
-    chart_title = container_col([
-        title('chart-title', f'{SYMBOL} {TIMEFRAME} Chart', 'bold-text'),
-        text('chart-last-update', f'{get_current_time()}')
-    ])
-
     chart_container = container([
-        get_chart(SYMBOL, data, []),
+        live_chart(SYMBOL, data, []),
     ], class_name='left')
     chart_container.id = 'chart-container'
 
@@ -67,7 +60,7 @@ def layout():
     home_content = container_row(children=[
         chart_container,
         right_container
-    ])
+    ], class_name='page-container')
 
     home_page = page(page_id='home-page', children=[
         chart_title,
@@ -107,33 +100,6 @@ def update_chart(_, __, symbol, timeframe, n_candles, selected_indicators, is_li
     last_update = get_current_time()
 
     data = get_market_data(symbol, get_timeframe_value(timeframe), n_candles, False)
-    chart = get_chart(symbol, data, indicators)
+    chart = live_chart(symbol, data, indicators)
 
     return chart_title, last_update, chart
-
-
-@callback(
-    Output('controls-play-pause', 'className'),
-    Input('controls-play-pause', 'n_clicks'),
-    State('controls-play-pause', 'className'),
-    prevent_initial_call=True
-)
-def controls_play_pause(_, current_classes):
-    return play_pause_callback(current_classes)
-
-
-@callback(
-    Output('controls-current-index', 'children'),
-    [Input('controls-decrease', 'n_clicks'),
-     Input('controls-increase', 'n_clicks'),
-     Input('controls-restart', 'n_clicks')],
-    [State('controls-current-index', 'children'),
-     State('n-candles-input', 'value')],
-    prevent_initial_call=True
-)
-def controls_increase_decrease(_, __, ___, component_text, n_candles):
-    if (n_candles is None) or (not callback_context.triggered):
-        raise ValueError(f"{__file__}: {controls_increase_decrease.__name__}\n"
-                         f"Unable to update index: n_candles={n_candles}\n")
-
-    return candlestick_index_callback(callback_context, component_text, n_candles)

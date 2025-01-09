@@ -6,9 +6,8 @@
     max-width: 100vw;
     max-height: 100vh;
 
-    margin: 0;
-    padding: 20px;
-    justify-content: center;
+    align-items: normal;
+    justify-content: normal;
 }
 
 .background {
@@ -54,14 +53,24 @@
     justify-content: center;
 }
 
+.container-space-around {
+    justify-content: space-around;
+}
+
+.container-space-between {
+    justify-content: space-between;
+}
+
 .left {
     overflow: hidden;
+    width: calc(100% - 450px);
     min-width: 450px;
     flex: 7;
 }
 
 .right {
     overflow: hidden;
+    width: 450px;
     min-width: 450px;
     flex: 3;
 }
@@ -69,4 +78,16 @@
 .switch-container {
     justify-content: space-between !important;
     align-items: center;
+}
+
+.upload-container {
+    min-width: 550px;
+}
+
+.graph-container {
+    height: calc(100% - 180px);
+}
+
+.page-container {
+    height: calc(100% - 160px);;
 }

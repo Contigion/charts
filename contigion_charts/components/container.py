@@ -2,7 +2,7 @@ from dash.html import Div
 
 
 def page(page_id, children=None, class_name=''):
-    classes = ' '.join(['container page full-height full-width container-col', class_name])
+    classes = ' '.join(['container page container-col', class_name])
     return Div(children, id=page_id, className=classes)
 
 

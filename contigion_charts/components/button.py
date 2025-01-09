@@ -1,7 +1,5 @@
-from dash.html import Button, I
+from dash.html import Button, I, P, Div
 from dash_daq import BooleanSwitch
-from .container import container_row
-from .text import text
 
 
 def button(button_id, text_input, class_name=''):
@@ -15,10 +13,10 @@ def icon_button(icon_id, class_name):
 
 
 def switch(switch_id, text_input, class_name=''):
-    classes = ' '.join(['component switch-container', class_name])
-    switch_component = container_row([
-        text(f'{switch_id}-text', text_input, 'switch-text bold-text'),
+    classes = ' '.join(['container container-row switch-container', class_name])
+    switch_component = Div([
+        P(id=f'{switch_id}-text', children=text_input, className='component text switch-text bold-text'),
         BooleanSwitch(id=switch_id, on=False, className='switch', color='#02203b')  # pylint: disable=not-callable
-    ], class_name=classes)
+    ], className=classes)
 
     return switch_component

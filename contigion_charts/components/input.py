@@ -1,5 +1,5 @@
-from dash.dcc import Dropdown, Checklist
-from dash.html import Div, P
+from dash.dcc import Dropdown, Checklist, Upload
+from dash.html import Div, P, A
 from dash_bootstrap_components import Input
 
 
@@ -42,3 +42,19 @@ def checklist(checkbox_id, label, default_value, options, class_name=''):
             className='checklist'
         )
     ], className=classes)
+
+
+def upload(upload_id, class_name='', file_type='CSV', allow_multiple=False):
+    classes = ' '.join(['component upload', class_name])
+    return Upload(
+        id=upload_id,
+        children=Div([
+            Div([
+                P('Drag and drop file or ', id=f'{upload_id}-label', className='component text'),
+                A(f'Select a {file_type} file', id=f'{upload_id}-button', className='component text button')
+            ], className='container container-row zero-padding-margin container-space-around'),
+            P('No file uploaded.', id=f'{upload_id}-output', className='component text'),
+        ], className='container container-col zero-padding-margin container-space-around'),
+        multiple=allow_multiple,
+        className=classes
+    )

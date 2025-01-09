@@ -1,4 +1,4 @@
-from dash.html import H1, H2, H3, P, A, I
+from dash.html import H1, H2, H3, P, A, I, Br
 
 
 def title(title_id, text_input, class_name=''):
@@ -19,6 +19,20 @@ def sub_heading(sub_heading_id, text_input, class_name=''):
 def text(text_id, text_input, class_name=''):
     classes = ' '.join(['component text', class_name])
     return P(text_input, id=text_id, className=classes)
+
+
+def paragraph(paragraph_id, lines, class_name=''):
+    classes = ' '.join(['component text', class_name])
+    paragraph_text = []
+
+    for line in lines:
+        paragraph_text.append(line)
+        paragraph_text.append(Br())
+
+    if paragraph_text:
+        paragraph_text.pop()
+
+    return P(paragraph_text, id=paragraph_id, className=classes)
 
 
 def link(link_id, text_input, href, class_name=''):
